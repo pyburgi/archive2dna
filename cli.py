@@ -22,9 +22,9 @@ pp = pprint.PrettyPrinter(depth=6)
 
 # Parse arguments
 usage = '''cli.py ACTION FILE_IN FILE_OUT [--id package_id] [--er error_rate] [--config config_section]
-           action : encode | decode | corrupt\n'''
+           action : encode | decode | corrupt | assess\n'''
 parser = argparse.ArgumentParser(description='Encode/decode information package to DNA.')
-parser.add_argument('action', help='encode | decode | corrupt .')
+parser.add_argument('action', help='encode | decode | corrupt | assess.')
 parser.add_argument('input_file', help='Input file.')
 parser.add_argument('output_file', help='Output file.')
 parser.add_argument('--id', dest='package_id', help='Information package ID, used to generate the primer')
@@ -132,6 +132,24 @@ elif args.action=='corrupt':
     open(dna_out, 'w').write( '\n'.join(text) )
     print('Corrupted segments :', corrupted_segments, '/', len(text) )
     print('Total number of corruptions :', number_of_corruptions)
+
+elif args.action=='assess':
+    dna = args.input_file
+    text = open(dna, 'r').read()
+    c = package.Container( package_id = args.package_id, 
+                           primer_length = primer_length,
+                           mi = mi,
+                           mo = mo,
+                           index_length = index_length,
+                           index_positions = index_positions,
+                           N = N,
+                           K = K,
+                           target_redundancy = target_redundancy,
+                           auto_zip = auto_zip )
+    
+    
+    homo = c.detect_mishap(text)
+    print(homo)    
     
 else:
     print(usage)

@@ -436,6 +436,42 @@ class Container:
         """Converts data to DNA segments and adds primers around each segment."""
         self.to_dna()
         self.add_primers()
+
+    #########################
+    ### DNA Assessment    ###
+    #########################
+
+    def detect_homopolymer(self):
+        temp = []
+        for x in self.dna :
+            new_dna = list(x)
+            n = len(new_dna)-1
+            homo = 1
+            for c in range(len(new_dna)-1):
+                if new_dna[c] == new_dna[c+1]:
+                    homo += 1
+                elif (homo > 2):
+                    temp.append(homo)
+                    homo = 1
+        return temp
+
+    def detect_GC(self):
+        total_nucleotide = 0
+        total_GC = 0
+        for x in self.dna :
+            total_nucleotide += len(x)
+            total_GC += x.count('GC')
+        ratio = total_GC/total_nucleotide*100
+        print('ration GC to toal DNA code is ', ratio)
+        if ratio > 50:
+            print("warninh: this ratio is superior to 50%")
+
+    def detect_mishap(self, text):
+        """Reads DNA text, remove primers around each segment, and search for homopolymers."""
+        self.read_dna(text)
+        self.remove_primers()
+        self.detect_GC()
+        return self.detect_homopolymer()
                                   
     #########################
     ### Data output : DNA ###
